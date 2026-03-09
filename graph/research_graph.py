@@ -7,6 +7,7 @@ from agents.outline_agent import generate_outline
 from agents.writer_agent import write_sections
 from tools.image_fetcher import fetch_images
 from pdf.pdf_generator import generate_pdf
+from decorator.decorators import step_logger
 
 
 class ResearchState(TypedDict):

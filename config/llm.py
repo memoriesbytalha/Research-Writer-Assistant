@@ -21,19 +21,3 @@ try:
 except Exception as e:
     print(f"Error initializing LLM: {e}")
 
-
-# TAVILY API KEY
-try:
-    if "TAVILY_API_KEY" not in os.environ:
-        os.environ["TAVILY_API_KEY"] = getpass.getpass("Enter your Tavily API key: ")
-        print("Tavily API key set successfully.")
-except Exception as e:
-    print(f"Error setting Tavily API key: {e}")
-
-
-# Initialize Tavily
-try:
-    tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
-    print("Tavily client initialized successfully.")
-except Exception as e:
-    print(f"Error initializing Tavily client: {e}")

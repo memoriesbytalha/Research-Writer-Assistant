@@ -1,6 +1,9 @@
-def main():
-    print("Hello from research-writer-assistant!")
+from graph.research_graph import build_graph
 
+graph = build_graph()
 
-if __name__ == "__main__":
-    main()
+result = graph.invoke({
+    "query": "Impact of AI on Healthcare"
+})
+
+print(result["pdf_path"])

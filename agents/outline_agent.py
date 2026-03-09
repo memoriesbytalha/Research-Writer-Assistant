@@ -1,5 +1,7 @@
 from config.llm import llm
+from decorator.decorators import step_logger
 
+@step_logger
 def generate_outline(state):
 
     material = "\n".join(state["sources_content"])
@@ -17,5 +19,4 @@ def generate_outline(state):
     response = llm.invoke(prompt)
 
     state["outline"] = response.content
-
     return state

@@ -2,12 +2,12 @@
 import os
 import requests
 from dotenv import load_dotenv
-
+from decorator.decorators import step_logger
 load_dotenv()
 
 SERPAPI_KEY = os.environ.get("serpi_account")
 
-
+@step_logger
 def fetch_images(state, limit=3):
     """
     Fetch images related to the research query and update the state.
