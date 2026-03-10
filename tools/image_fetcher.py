@@ -2,7 +2,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from decorator.decorators import step_logger
+from my_decorators.decorators import step_logger
 load_dotenv()
 
 SERPAPI_KEY = os.environ.get("serpi_account")

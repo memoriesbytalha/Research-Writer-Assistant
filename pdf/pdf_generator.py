@@ -1,6 +1,6 @@
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
-from decorator.decorators import step_logger
+from my_decorators.decorators import step_logger
 @step_logger
 def generate_pdf(state):
 
