@@ -214,5 +214,6 @@ For questions, issues, or contributions:
 - Review the code comments for implementation details
 
 ---
+[research_paper.pdf]
 
 **Made with ❤️ for researchers and writers everywhere**
