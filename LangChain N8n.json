@@ -1,0 +1,105 @@
+{
+  "name": "Full workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/research",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        176,
+        -160
+      ],
+      "id": "c8543034-d61b-464f-be7c-4fa2ba4710af",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -48,
+        -160
+      ],
+      "id": "a5ba8b9c-c5d0-46d5-b9bd-cf4a3fd99ddc",
+      "name": "When chat message received",
+      "webhookId": "d7bb9629-4bbb-44f6-9b71-a8b3fd491386"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b55a7e6c-7b85-4f71-b426-8cea2c287c13",
+              "name": "text",
+              "value": "=Your research paper is ready! View PDF: http://localhost:8000/research/{{ $json.job_id }}/download",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        -160
+      ],
+      "id": "7e909733-3b08-4f36-a1fa-5c218b2f99e1",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9a79acb4-d751-441a-ac0b-98a401ffec5f",
+  "meta": {
+    "instanceId": "9a3d9ffbfb088146222a540489d9696887c1e79f70ceeb98db5b10d8110e7a0c"
+  },
+  "id": "VIs0P4ZElHKoCdLM",
+  "tags": []
+}

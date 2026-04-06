@@ -1,219 +1,185 @@
-# Research Writer Assistant 🤖📝
+# Research Writer Assistant 🤖📄
 
-An intelligent AI-powered research assistant that automates the entire research paper writing process. From topic exploration to final PDF generation, this tool streamlines academic and professional research workflows.
+An AI agent that takes a research topic and produces a fully written, professionally structured research paper as a PDF — triggered from a simple chat message.
 
-![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
-![LangGraph](https://img.shields.io/badge/LangGraph-1.0+-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
+[![LangGraph](https://img.shields.io/badge/LangGraph-1.0+-green.svg)](https://langchain-ai.github.io/langgraph/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-teal.svg)](https://fastapi.tiangolo.com)
+[![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)](https://docker.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## ✨ Features
+---
 
-- **🔍 Intelligent Web Search**: Leverages Tavily API for comprehensive, up-to-date research
-- **📄 Content Extraction**: Advanced web scraping with Trafilatura for clean, structured data
-- **🗂️ Smart Outlining**: AI-generated research paper outlines tailored to your topic
-- **✍️ Automated Writing**: Section-by-section content generation using multiple LLM providers
-- **🖼️ Visual Enhancement**: Automatic image fetching and integration
-- **📋 PDF Generation**: Professional PDF output with ReportLab
-- **🔄 Workflow Orchestration**: Powered by LangGraph for reliable, traceable execution
-- **🎯 Multi-LLM Support**: Compatible with OpenAI, Google Gemini, and Groq models
+## How it works
 
-## 🏗️ Architecture
-
-The system follows a structured workflow orchestrated by LangGraph:
+You type a topic in the n8n chat interface. The full pipeline runs automatically and returns a PDF link.
 
 ```
-Search → Scrape → Outline → Write → Images → PDF
+User types topic
+      ↓
+n8n chat interface
+      ↓
+POST /research  (FastAPI)
+      ↓
+LangGraph pipeline
+  Search → Scrape → Outline → Write → Images → PDF
+      ↓
+PDF saved to ./output/
+      ↓
+Download link returned to chat
 ```
 
-### Core Components
+---
 
-- **`agents/`**: AI agents for outline generation and content writing
-- **`tools/`**: Web search, content scraping, and image fetching utilities
-- **`graph/`**: LangGraph workflow definition and state management
-- **`pdf/`**: PDF generation and formatting
-- **`config/`**: LLM configuration and API management
+## Stack
 
-## 🚀 Quick Start
+| Layer | Technology |
+|---|---|
+| LLM | Groq — Llama 3.3 70B |
+| Web search | Tavily API |
+| Pipeline orchestration | LangGraph |
+| API layer | FastAPI + Uvicorn |
+| Chat frontend | n8n |
+| Containerization | Docker + uv |
+| Dependency management | uv (frozen lockfile) |
+
+---
+
+## Quickstart
 
 ### Prerequisites
 
-- Python 3.12+
-- **Groq API key** (currently used LLM provider)
-- Tavily API key for web search
-- Alternative: OpenAI or Google AI API keys (optional)
+- Python 3.12
+- [uv](https://docs.astral.sh/uv/)
+- Docker + Docker Compose
+- Groq API key
+- Tavily API key
 
-### Installation
+### Run locally
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/research-writer-assistant.git
-   cd research-writer-assistant
-   ```
+```bash
+git clone https://github.com/memoriesbytalha/Research-Writer-Assistant.git
+cd Research-Writer-Assistant
 
-2. **Create virtual environment**
-   ```bash
-   python -m venv .venv
-   # On Windows
-   .venv\Scripts\activate
-   # On macOS/Linux
-   source .venv/bin/activate
-   ```
+# Pin Python version
+uv python pin 3.12
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Install dependencies from lockfile
+uv sync
 
-4. **Configure environment variables**
+# Create .env file
+cp .env.example .env
+# Add your API keys to .env
 
-   Create a `.env` file in the root directory:
-   ```env
-   # Primary LLM provider (currently ChatGroq)
-   GROQ_API_KEY=your_groq_key_here
-
-   # Alternative LLM providers
-
-   # Required for web search
-   TAVILY_API_KEY=your_tavily_key_here
-   SERPAPI_API_KEY=your_serpapi_key_here
-   ```
-
-### Usage
-
-1. **Run the research assistant**
-   ```python
-   python main.py
-   ```
-
-2. **Customize your research topic**
-
-   Edit the query in `main.py`:
-   ```python
-   result = graph.invoke({
-       "query": "Your Research Topic Here"
-   })
-   ```
-
-3. **View results**
-
-   The system will generate:
-   - Research outline
-   - Written sections
-   - Integrated images
-   - Final PDF document
-
-## 📋 Configuration
-
-### LLM Configuration
-
-The system supports multiple LLM providers. Currently configured to use **ChatGroq** with Llama 3.3 70B. Configure your preferred model in `config/llm.py`:
-
-```python
-# Current configuration (ChatGroq)
-llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
-    temperature=0,
-    api_key=os.getenv("GROQ_API_KEY")
-)
-
-# Alternative configurations
-# llm = ChatOpenAI(model="gpt-4", temperature=0.7)
-# llm = ChatGoogleGenerativeAI(model="gemini-pro")
+# Run
+uv run main.py
 ```
 
-### Workflow Customization
+FastAPI docs available at `http://localhost:8000/docs`.
 
-Modify the research graph in `graph/research_graph.py` to customize the workflow steps and their connections.
+### Run with Docker + n8n
 
-## 🛠️ Development
+```bash
+# Create output folder
+mkdir output
 
-### Project Structure
+# Build and start all services
+docker compose up --build
+```
+
+Services:
+- FastAPI → `http://localhost:8000`
+- n8n → `http://localhost:5678`
+
+### API usage
+
+```bash
+curl -X POST http://localhost:8000/research \
+  -H "Content-Type: application/json" \
+  -d '{"query": "KServe and vLLM on OpenShift AI"}'
+```
+
+Response:
+```json
+{
+  "job_id": "abc123",
+  "query": "KServe and vLLM on OpenShift AI",
+  "pdf_path": "/app/output/abc123.pdf",
+  "message": "Research paper generated successfully"
+}
+```
+
+Download the PDF:
+```
+GET http://localhost:8000/research/{job_id}/download
+```
+
+---
+
+## n8n workflow
+
+The n8n workflow is 3 nodes:
+
+```
+Chat Trigger → HTTP Request → Edit Fields
+```
+
+Import `n8n_workflow.json` into your n8n instance to get started immediately.
+
+In the HTTP Request node:
+- Method: `POST`
+- URL: `http://app:8000/research`
+- Body: `{ "query": "{{ $json.chatInput }}" }`
+
+---
+
+## Project structure
 
 ```
 research-writer-assistant/
-├── agents/                 # AI agents
-│   ├── outline_agent.py   # Research outline generation
-│   └── writer_agent.py    # Content writing
-├── tools/                 # Utility tools
-│   ├── web_search.py      # Tavily-powered search
-│   ├── scraper.py         # Content extraction
-│   └── image_fetcher.py   # Image collection
-├── graph/                 # Workflow orchestration
-│   └── research_graph.py  # LangGraph definition
-├── pdf/                   # Document generation
-│   └── pdf_generator.py   # PDF creation
-├── config/                # Configuration
-│   └── llm.py            # LLM setup
-└── my_decorators/         # Logging utilities
-    └── decorators.py      # Step logging
+├── agents/
+│   ├── outline_agent.py      # Research outline generation
+│   └── writer_agent.py       # Section-by-section writing
+├── tools/
+│   ├── web_search.py         # Tavily-powered search
+│   ├── scraper.py            # Content extraction
+│   └── image_fetcher.py      # Image collection
+├── graph/
+│   └── research_graph.py     # LangGraph workflow
+├── pdf/
+│   └── pdf_generator.py      # PDF creation with ReportLab
+├── config/
+│   └── llm.py                # LLM configuration
+├── main.py                   # FastAPI application
+├── Dockerfile
+├── docker-compose.yml
+└── n8n_workflow.json         # Importable n8n workflow
 ```
 
-### Adding New Features
+---
 
-1. **Create a new tool** in the `tools/` directory
-2. **Add an agent** in the `agents/` directory if needed
-3. **Update the graph** in `research_graph.py` to include new steps
-4. **Test the workflow** by running `main.py`
+## Environment variables
 
-## 🔧 Dependencies
-
-### Core Dependencies
-
-- **LangChain**: LLM orchestration and chaining
-- **LangGraph**: Workflow state management
-- **Tavily**: Web search API
-- **Trafilatura**: Web content extraction
-- **ReportLab**: PDF generation
-- **Requests**: HTTP client
-
-### LLM Providers
-
-- **OpenAI**: GPT models
-- **Google AI**: Gemini models
-- **Groq**: Fast inference models
-
-## 📊 Example Output
-
-The assistant generates a complete research paper including:
-
-- **Executive Summary**
-- **Introduction**
-- **Literature Review**
-- **Methodology**
-- **Results & Analysis**
-- **Conclusion**
-- **References**
-
-All content is properly formatted and ready for academic submission.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **LangChain** for the powerful LLM orchestration framework
-- **LangGraph** for state-of-the-art workflow management
-- **Tavily** for reliable web search capabilities
-- **Trafilatura** for robust content extraction
-
-## 📞 Support
-
-For questions, issues, or contributions:
-
-- Open an issue on GitHub
-- Check the documentation in this README
-- Review the code comments for implementation details
+```env
+GROQ_API_KEY=your_groq_key_here
+TAVILY_API_KEY=your_tavily_key_here
+SERPAPI_API_KEY=your_serpapi_key_here
+```
 
 ---
-[research_paper.pdf]
 
-**Made with ❤️ for researchers and writers everywhere**
+## Roadmap
+
+- [x] LangGraph pipeline (search → scrape → outline → write → PDF)
+- [x] FastAPI REST wrapper
+- [x] Docker + uv containerization
+- [x] n8n chat interface
+- [ ] Async Redis queue for non-blocking responses
+- [ ] OpenShift AI deployment
+- [ ] Job status polling endpoint
+
+---
+
+## License
+
+MIT
