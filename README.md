@@ -174,7 +174,6 @@ SERPAPI_API_KEY=your_serpapi_key_here
 - [x] FastAPI REST wrapper
 - [x] Docker + uv containerization
 - [x] n8n chat interface
-- [ ] Async Redis queue for non-blocking responses
 - [ ] OpenShift AI deployment
 - [ ] Job status polling endpoint
 
